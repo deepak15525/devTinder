@@ -2,29 +2,18 @@
 
 const express = require("express");
 const app = express();
+const { user } = require("./middlewares/auth");
 
-app.use(
-	"/user",
-	(req, res, next) => {
-		console.log("first route 1");
-		next();
-		//res.send("Response 1");
-	},
-	(req, res, next) => {
-		console.log("first route 2");
-		next();
-		//res.send("Response 2");
-	},
-	(req, res, next) => {
-		console.log("first route 3");
-		next();
-		//res.send("Response 3");
-	},
-	(req, res, next) => {
-		console.log("first route 4");
-		//next();
-		res.send("Response 4");
+app.get("/user", user, (req, res) => {
+	res.send("User is Authenricatted");
+});
+
+//Error Handling Code using app.use() or whild card route
+
+app.use("/", (err, req, res, next) => {
+	if (err) {
+		res.status(500).send("Something went wrong!!!");
 	}
-);
+});
 
-app.listen(3000, () => console.log("Listening on port 3000"));
+app.listen(3000, () => console.log("Server running on port 3000"));
