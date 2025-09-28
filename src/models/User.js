@@ -2,6 +2,7 @@
 
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
+var validator = require("validator");
 
 const userSchema = new Schema(
 	{
@@ -19,15 +20,23 @@ const userSchema = new Schema(
 			type: String,
 			required: true,
 			unique: true,
-			match: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
 			lowercase: true,
 			trim: true,
+			validate(value) {
+				if (!validator.isEmail(value)) {
+					throw new Error("Invalid Email");
+				}
+			},
 		},
 		password: {
 			type: String,
 			required: true,
 			minLength: 5,
-			maxLength: 14,
+			validate(value) {
+				if (!validator.isStrongPassword(value)) {
+					throw new Error("Password is not strong enough");
+				}
+			},
 		},
 		age: {
 			type: String,
