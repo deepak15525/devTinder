@@ -6,7 +6,6 @@ const { User } = require("./models/User");
 const { validationRules } = require("./utils/Validator");
 const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
-var jwt = require("jsonwebtoken");
 const { userAuth } = require("./middlewares/auth");
 
 app.use(express.json());
@@ -40,14 +39,12 @@ app.post("/login", async (req, res) => {
 		if (!user) {
 			res.status(404).send("Unauthenticated User");
 		}
-		const isMatch = await bcrypt.compare(password, user.password);
+		const isMatch = await user.verifyPassword(password);
 		if (!user) {
 			res.status(404).send("Unauthenticated User");
 		}
 
-		const token = jwt.sign({ emailId: user.emailId }, "deepak", {
-			expiresIn: "7d",
-		});
+		const token = await user.getToken();
 
 		res.cookie("token", token, {
 			maxAge: 7 * 24 * 60 * 60 * 1000,
