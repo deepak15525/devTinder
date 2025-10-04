@@ -70,6 +70,8 @@ const userSchema = new Schema(
 		timestamps: true,
 	}
 );
+//Compound Index
+userSchema.index({ firstName: 1, lastName: 1 });
 
 userSchema.methods.getToken = function () {
 	const user = this;

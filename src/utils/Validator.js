@@ -17,6 +17,24 @@ const validationRules = (req) => {
 	}
 };
 
+const validateProfileData = (req) => {
+	const allowedFields = [
+		"firstName",
+		"lastName",
+		"emailId",
+		"age",
+		"gender",
+		"photo",
+		"about",
+		"skills",
+	];
+	const isAllowed = Object.keys(req.body).every((k) =>
+		allowedFields.includes(k)
+	);
+	return isAllowed;
+};
+
 module.exports = {
 	validationRules,
+	validateProfileData,
 };

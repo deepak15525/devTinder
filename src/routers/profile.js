@@ -4,6 +4,7 @@ const express = require("express");
 const profileRouter = express.Router();
 const { User } = require("../models/User");
 const { userAuth } = require("../middlewares/auth");
+const { validateProfileData } = require("../utils/Validator");
 
 profileRouter.get("/users", userAuth, async (req, res) => {
 	const user = req.user;
@@ -27,15 +28,14 @@ profileRouter.get("/feeds", userAuth, async (req, res) => {
 });
 
 //user
-profileRouter.get("/profile", userAuth, async (req, res) => {
+profileRouter.get("/profile/view", userAuth, async (req, res) => {
 	try {
-		const user = req.user;
+		const user = req?.user?.userData;
 		res.send(user);
 	} catch (err) {
 		res.status(400).send("Something went wrong!!!");
 	}
 });
-
 //user data find by id
 profileRouter.get("/userfindbyid", userAuth, async (req, res) => {
 	const userId = req.body.id;
@@ -83,6 +83,33 @@ profileRouter.patch("/update-user", userAuth, async (req, res) => {
 		res.send(user);
 	} catch (err) {
 		res.status(400).send(err.message);
+	}
+});
+
+profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
+	try {
+		const isAllowed = await validateProfileData(req);
+		if (!isAllowed) {
+			throw new Error("Invalod Updates Data!!!");
+		}
+		if (req?.body?.skills.length > 10) {
+			throw new Error("Skills should not be more than 10");
+		}
+
+		const { emailId } = req.body;
+
+		const user = await User.findOneAndUpdate(
+			{
+				emailId: emailId,
+			},
+			req.body,
+			{
+				runValidators: true,
+			}
+		);
+		res.send(user);
+	} catch (err) {
+		res.status(400).send("ERROR: " + err.message);
 	}
 });
 
