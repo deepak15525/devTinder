@@ -34,7 +34,21 @@ const validateProfileData = (req) => {
 	return isAllowed;
 };
 
+const requestSendValidation = (status) => {
+	const allowedStatus = ["ignored", "intrested"];
+	const isAllowed = allowedStatus.includes(status);
+	return isAllowed;
+};
+
+const reviewRequestValidation = (status) => {
+	const allowedStatus = ["accepted","rejected"];
+	const isAllowed = allowedStatus.includes(status);
+	return isAllowed;
+};
+
 module.exports = {
 	validationRules,
 	validateProfileData,
+	requestSendValidation,
+	reviewRequestValidation,
 };

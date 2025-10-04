@@ -2,7 +2,7 @@
 
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
-const statusValue = ["ignored", "accepted", "rejected", "matched"];
+const statusValue = ["ignored", "accepted", "rejected", "matched", "intrested"];
 
 const connectionRequest = new Schema(
 	{
