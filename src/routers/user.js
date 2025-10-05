@@ -4,6 +4,7 @@ const express = require("express");
 const userRouter = express.Router();
 const { ConnectionRequest } = require("../models/ConnectionRequest");
 const { userAuth } = require("../middlewares/auth");
+const { User } = require("../models/User");
 
 const POPULATE_RESPONSE = "firstName lastName age gender photo about skills";
 
@@ -43,6 +44,34 @@ userRouter.get("/user/connections", userAuth, async (req, res) => {
 			.json({ message: "Requests found successfully", data: connections });
 	} catch (err) {
 		res.status(400).send("ERROR :" + err);
+	}
+});
+
+userRouter.get("/feed", userAuth, async (req, res) => {
+	try {
+		const loggedInUserId = req.user.userData?._id;
+		const connections = await ConnectionRequest.find({
+			$or: [{ recieverId: loggedInUserId }, { senderId: loggedInUserId }],
+		}).select(["recieverId", "senderId"]);
+		const hasUniqueConnectionData = new Set();
+
+		connections.forEach((req) => {
+			hasUniqueConnectionData.add(req.senderId.toString());
+			hasUniqueConnectionData.add(req.recieverId.toString());
+		});
+
+		const excludeIds = Array.from(hasUniqueConnectionData);
+		excludeIds.push(loggedInUserId.toString());
+		//console.log(Array.from(hasUniqueConnectionData));
+		const users = await User.find({
+			_id: { $nin: excludeIds },
+		}).select(["firstName", "lastName"]);
+		res.json({
+			message: "Feed fetched successfully",
+			data: users,
+		});
+	} catch (err) {
+		res.status(400).send("ERROR :" + err.message);
 	}
 });
 
