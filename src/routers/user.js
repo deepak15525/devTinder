@@ -7,6 +7,7 @@ const { userAuth } = require("../middlewares/auth");
 const { User } = require("../models/User");
 
 const POPULATE_RESPONSE = "firstName lastName age gender photo about skills";
+//a[i]
 
 userRouter.get("/user/requests/recieved", userAuth, async (req, res) => {
 	try {
